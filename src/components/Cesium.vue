@@ -9,11 +9,14 @@ import positiveY from '../assets/img/SkyBox/06h+00.jpg'
 import negativeY from '../assets/img/SkyBox/18h+00.jpg'
 import positiveZ from '../assets/img/SkyBox/06h+90.jpg'
 import negativeZ from '../assets/img/SkyBox/06h-90.jpg'
+// eslint-disable-next-line no-unused-vars
+import {LOCAL_IMG_URL, LOCAL_TERRAIN_URL} from '../../static/commonJS/config.js'
+let viewer = null
 export default {
   name: 'Cesium',
   data () {
     return {
-      viewer: null
+      // viewer: null
     }
   },
   mounted () {
@@ -22,8 +25,8 @@ export default {
   methods: {
     initViewer () {
       var imageryProvider = new Cesium.UrlTemplateImageryProvider({
-        //   url: LOCAL_IMG_URL,
-        url: 'http://localhost:9090/Data/BASE_DATA/IMAGE/{z}/{x}/{y}.png',
+        url: LOCAL_IMG_URL,
+        // url: 'http://localhost:9090/Data/BASE_DATA/IMAGE/{z}/{x}/{y}.png',
         tilingScheme: new Cesium.WebMercatorTilingScheme(),
         fileExtension: 'png',
         minimumLevel: 0,
@@ -31,11 +34,11 @@ export default {
       })
       // eslint-disable-next-line no-unused-vars
       var terrainProvider = new Cesium.CesiumTerrainProvider({
-        // url: LOCAL_TERRAIN_URL,
-        url: 'http://localhost:9090/Data/BASE_DATA/TERRIAN', // 本地全球dem
+        url: LOCAL_TERRAIN_URL,
+        // url: 'http://localhost:9090/Data/BASE_DATA/TERRIAN', // 本地全球dem
         requestWaterMask: true // 请求水波纹效果
       })
-      this.viewer = new Cesium.Viewer('cesiumContainer', {
+      viewer = new Cesium.Viewer('cesiumContainer', {
       // terrainExaggeration:0.95,
         imageryProvider: imageryProvider,
         // terrainProvider: terrainProvider,
@@ -51,7 +54,7 @@ export default {
         infoBox: false
       })
       // 用于渲染星空的SkyBox对象
-      this.viewer.scene.skyBox = new Cesium.SkyBox({
+      viewer.scene.skyBox = new Cesium.SkyBox({
         sources: {
           positiveX: positiveX,
           negativeX: negativeX,
@@ -61,16 +64,16 @@ export default {
           negativeZ: negativeZ
         }
       })
-      this.viewer._cesiumWidget._creditContainer.style.display = 'none'
-      this.viewer.scene.globe.showGroundAtmosphere = false
-      // this.viewer.scene.globe.baseColor = Color.BLACK
-      this.viewer.scene.globe.baseColor = new Cesium.Color(1, 1, 1, 0) // 修改地球颜色
-      // this.viewer.scene.primitives.add(createOsmBuildings())
-      // this.viewer.scene.camera.flyTo({
+      viewer._cesiumWidget._creditContainer.style.display = 'none'
+      viewer.scene.globe.showGroundAtmosphere = false
+      // viewer.scene.globe.baseColor = Color.BLACK
+      viewer.scene.globe.baseColor = new Cesium.Color(1, 1, 1, 0) // 修改地球颜色
+      // viewer.scene.primitives.add(createOsmBuildings())
+      // viewer.scene.camera.flyTo({
       //   destination: Cartesian3.fromDegrees(-74.019, 40.6912, 750)
       // })
 
-      this.viewer.camera.setView({
+      viewer.camera.setView({
         // Cesium的坐标是以地心为原点，一向指向南美洲，一向指向亚洲，一向指向北极州
         // fromDegrees()方法，将经纬度和高程转换为世界坐标
         destination: Cesium.Cartesian3.fromDegrees(99, 36.4, 18000008),
@@ -82,10 +85,10 @@ export default {
           // roll:0.0
         }
       })
-      this.viewer.scene.globe.depthTestAgainstTerrain = true
-      const handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas)
+      viewer.scene.globe.depthTestAgainstTerrain = true
+      const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas)
       this.$store.state.cesiumDrawHandler = handler
-      window.cesiumViewer = this.viewer
+      window.cesiumViewer = viewer
     }
   }
 }
