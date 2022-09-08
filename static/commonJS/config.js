@@ -19,3 +19,7 @@ export const BING_IMG_URL = 'https://dev.virtualearth.net'
  */
 // export const LOCAL_TERRAIN_URL ='http://127.0.0.1:6060/Data/BASE_DATA/basicWorldDEM'// 本地全球dem
 export const LOCAL_TERRAIN_URL = 'http://localhost:9090/Data/ZRZY/TaiCang/TERRAIN'// 本地全球dem
+
+// export const urlModel = './model/dwendwen.gltf'
+export const urlModel = 'http://localhost:9090/Data/scene(2).gltf'
+
