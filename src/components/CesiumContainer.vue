@@ -1,3 +1,4 @@
+<!-- eslint-disable camelcase -->
 <!-- eslint-disable no-unused-vars -->
 <template>
   <div id="cesiumContainer" ref="cesiumContainer"></div>
@@ -18,12 +19,11 @@ import {
   TDT_VEC_IMG_URL,
   urlModel
 } from '../../static/commonJS/config.js'
-// eslint-disable-next-line no-unused-vars
-// import { BaiduImageryProvider, AmapImageryProvider } from '../../static/commonJS/BaiduImageryProvider.js'
+import { BaiduImageryProvider, AmapImageryProvider } from '../../static/commonJS/BaiduImageryProvider.js'
 // import sss from '../../static/model/scene(2).gltf'
 let viewer = null
 export default {
-  name: 'Cesium',
+  name: 'cesiumContainer',
   data () {
     return {
       // viewer: null
@@ -66,30 +66,50 @@ export default {
         selectionIndicator: false,
         infoBox: false
       })
-      // // 通过imageryLayers获取图层列表集合
+      // 通过imageryLayers获取图层列表集合
       var layers = viewer.scene.imageryLayers
       console.log('图层信息：', layers)
-      // // 图层列表集合的addImageryProvider方法:
-      // // 两个参数，第一参数是一个ImageryProvider函数，这个函数的作用是新建一个图层;第二个参数是index，Number类型，作用是指定新插入图层在图层列表集合中的索引(位置)，若不指定，默认新图层添加在最上层
-      // // 返回值是新添加到图层列表集合中的图层
-      // var baiduImageryLayer = layers.addImageryProvider(
-      //   new BaiduImageryProvider({
-      //     url: 'http://online{s}.map.bdimg.com/onlinelabel/?qt=tile&x={x}&y={y}&z={z}&styles=pl&scaler=1&p=1',
-      //     layer: 'tdtAnnoLayer',
-      //     style: 'dark',
-      //     format: 'image/jpeg',
-      //     maximumLevel: 18,
-      //     subdomains: this.subdomains,
-      //     tileMatrixSetID: 'GoogleMapsCompatible',
-      //     crs: 'WGS84', // 坐标系: WGS84 、BD09 、GCJ02，仅百度、高德有效
-      //     tilingScheme: null
-      //   })
-      // )
-      // // get或set图层透明度，范围是0-1
-      // baiduImageryLayer.alpha = 0.6
+      // 图层列表集合的addImageryProvider方法:
+      // 两个参数，第一参数是一个ImageryProvider函数，这个函数的作用是新建一个图层;第二个参数是index，Number类型，作用是指定新插入图层在图层列表集合中的索引(位置)，若不指定，默认新图层添加在最上层
+      // 返回值是新添加到图层列表集合中的图层
+      var baiduImageryLayer = layers.addImageryProvider(
+        new BaiduImageryProvider({
+          url: 'http://online{s}.map.bdimg.com/onlinelabel/?qt=tile&x={x}&y={y}&z={z}&styles=pl&scaler=1&p=1',
+          layer: 'tdtAnnoLayer',
+          style: 'dark',
+          format: 'image/jpeg',
+          maximumLevel: 18,
+          subdomains: this.subdomains,
+          tileMatrixSetID: 'GoogleMapsCompatible',
+          crs: 'WGS84', // 坐标系: WGS84 、BD09 、GCJ02，仅百度、高德有效
+          tilingScheme: null
+        })
+      )
+      // get或set图层透明度，范围是0-1
+      baiduImageryLayer.alpha = 0.6
 
-      // // get或set图层亮度，小于1图层更暗，大于1更亮
-      // baiduImageryLayer.brightness = 1.0
+      // get或set图层亮度，小于1图层更暗，大于1更亮
+      baiduImageryLayer.brightness = 1.0
+      // 添加高德地图并使用插件纠偏
+      var gaodeImageryLayer = layers.addImageryProvider(
+        new AmapImageryProvider({
+          url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
+          layer: 'tdtAnnoLayer',
+          style: 'default',
+          format: 'image/jpeg',
+          maximumLevel: 18,
+          subdomains: this.subdomains,
+          tileMatrixSetID: 'GoogleMapsCompatible',
+          crs: 'WGS84', // 坐标系: WGS84 、BD09 、GCJ02，仅百度、高德有效
+          tilingScheme: null
+        })
+      )
+      // get或set图层透明度，范围是0-1
+      gaodeImageryLayer.alpha = 0.6
+
+      // get或set图层亮度，小于1图层更暗，大于1更亮
+      gaodeImageryLayer.brightness = 1.0
+
       // 用于渲染星空的SkyBox对象
       viewer.scene.skyBox = new Cesium.SkyBox({
         sources: {
@@ -168,7 +188,10 @@ export default {
         extent.ymax = Cesium.Math.toDegrees(cartoLt.latitude)
         extent.xmax = Cesium.Math.toDegrees(cartoRb.longitude)
         extent.ymin = Cesium.Math.toDegrees(cartoRb.latitude)
-      } else if (!car3Lt && car3Rb) { // 当canvas左上角不在但右下角在椭球体上
+      }
+
+      // 当canvas左上角不在但右下角在椭球体上
+      else if (!car3Lt && car3Rb) {
         var car3Lt2 = null
         var yIndex = 0
         do {

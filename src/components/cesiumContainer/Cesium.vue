@@ -4,12 +4,12 @@
 </template>
 
 <script>
-import positiveX from '../assets/img/SkyBox/00h+00.jpg'
-import negativeX from '../assets/img/SkyBox/12h+00.jpg'
-import positiveY from '../assets/img/SkyBox/06h+00.jpg'
-import negativeY from '../assets/img/SkyBox/18h+00.jpg'
-import positiveZ from '../assets/img/SkyBox/06h+90.jpg'
-import negativeZ from '../assets/img/SkyBox/06h-90.jpg'
+import positiveX from '../../assets/img/SkyBox/00h+00.jpg'
+import negativeX from '../../assets/img/SkyBox/12h+00.jpg'
+import positiveY from '../../assets/img/SkyBox/06h+00.jpg'
+import negativeY from '../../assets/img/SkyBox/18h+00.jpg'
+import positiveZ from '../../assets/img/SkyBox/06h+90.jpg'
+import negativeZ from '../../assets/img/SkyBox/06h-90.jpg'
 // eslint-disable-next-line no-unused-vars
 import {
   LOCAL_IMG_URL,
@@ -17,7 +17,7 @@ import {
   // eslint-disable-next-line no-unused-vars
   TDT_VEC_IMG_URL,
   urlModel
-} from '../../static/commonJS/config.js'
+} from '../../../static/commonJS/config.js'
 // eslint-disable-next-line no-unused-vars
 // import { BaiduImageryProvider, AmapImageryProvider } from '../../static/commonJS/BaiduImageryProvider.js'
 // import sss from '../../static/model/scene(2).gltf'

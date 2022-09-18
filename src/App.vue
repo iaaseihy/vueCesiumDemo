@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import Cesium from './components/Cesium.vue'
+import Cesium from './components/cesiumContainer/Cesium.vue'
 export default {
   name: 'App',
   comments: {
