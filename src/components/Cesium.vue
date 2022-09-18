@@ -1,6 +1,6 @@
 <!-- eslint-disable no-unused-vars -->
 <template>
-  <div id="cesiumContainer"></div>
+  <div id="cesiumContainer" ref="cesiumContainer"></div>
 </template>
 
 <script>
@@ -86,8 +86,8 @@ export default {
       //   destination: Cartesian3.fromDegrees(-74.019, 40.6912, 750)
       // })
 
-      // 加载100000个模型
-      this.addGlbCollection()
+      // // 加载100000个模型
+      // this.addGlbCollection()
       viewer.camera.setView({
         // Cesium的坐标是以地心为原点，一向指向南美洲，一向指向亚洲，一向指向北极州
         // fromDegrees()方法，将经纬度和高程转换为世界坐标
@@ -98,7 +98,7 @@ export default {
         ),
         orientation: {
           // 指向
-          heading: Cesium.Math.toRadians(90, 0),
+          heading: Cesium.Math.toRadians(0, 0),
           // 视角
           pitch: Cesium.Math.toRadians(-90),
           roll: 0.0
@@ -108,6 +108,76 @@ export default {
       // const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas)
       // this.$store.state.cesiumDrawHandler = handler
       window.cesiumViewer = viewer
+      viewer.camera.moveEnd.addEventListener(this.getCurrentExtent)
+    },
+    // 获取当前相机视角内的图幅范围
+    getCurrentExtent () {
+      // 范围对象
+      var extent = {}
+
+      // 得到当前三维场景
+      var scene = viewer.scene
+
+      // 得到当前三维场景的椭球体
+      var ellipsoid = scene.globe.ellipsoid
+      var canvas = scene.canvas
+
+      // canvas左上角
+      var car3_lt = viewer.camera.pickEllipsoid(
+        new Cesium.Cartesian2(0, 0),
+        ellipsoid
+      )
+
+      // canvas右下角
+      var car3_rb = viewer.camera.pickEllipsoid(
+        new Cesium.Cartesian2(canvas.width, canvas.height),
+        ellipsoid
+      )
+
+      // 当canvas左上角和右下角全部在椭球体上
+      if (car3_lt && car3_rb) {
+        var carto_lt = ellipsoid.cartesianToCartographic(car3_lt)
+        var carto_rb = ellipsoid.cartesianToCartographic(car3_rb)
+        extent.xmin = Cesium.Math.toDegrees(carto_lt.longitude)
+        extent.ymax = Cesium.Math.toDegrees(carto_lt.latitude)
+        extent.xmax = Cesium.Math.toDegrees(carto_rb.longitude)
+        extent.ymin = Cesium.Math.toDegrees(carto_rb.latitude)
+      }
+
+      // 当canvas左上角不在但右下角在椭球体上
+      else if (!car3_lt && car3_rb) {
+        var car3_lt2 = null
+        var yIndex = 0
+        do {
+          // 这里每次10像素递加，一是10像素相差不大，二是为了提高程序运行效率
+          yIndex <= canvas.height ? (yIndex += 10) : canvas.height
+          car3_lt2 = viewer.camera.pickEllipsoid(
+            new Cesium.Cartesian2(0, yIndex),
+            ellipsoid
+          )
+        } while (!car3_lt2)
+        var carto_lt2 = ellipsoid.cartesianToCartographic(car3_lt2)
+        var carto_rb2 = ellipsoid.cartesianToCartographic(car3_rb)
+        extent.xmin = Cesium.Math.toDegrees(carto_lt2.longitude)
+        extent.ymax = Cesium.Math.toDegrees(carto_lt2.latitude)
+        extent.xmax = Cesium.Math.toDegrees(carto_rb2.longitude)
+        extent.ymin = Cesium.Math.toDegrees(carto_rb2.latitude)
+      }
+
+      // 获取高度
+      extent.height = Math.ceil(viewer.camera.positionCartographic.height)
+      // 获取当前缩放的地图层级
+      let level = 0
+      if (viewer.scene.globe._surface._tilesToRender.length) {
+        level = viewer.scene.globe._surface._tilesToRender[0].level
+        console.log('当前地图层级=======', level)
+      }
+      console.log(
+        '地图变化监听事件',
+        extent,
+        (extent.xmin + extent.xmax) / 2,
+        (extent.ymax + extent.ymin) / 2
+      )
     },
     /* 加载gltf或glb格式模型 */
     addGlbCollection () {
